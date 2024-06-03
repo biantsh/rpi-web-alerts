@@ -5,15 +5,12 @@ const socketio = require('socket.io');
 const app = express();
 
 app.use(cors());
+app.use(express.static('dist'));
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 const server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-const io = socketio(server, {
-  cors: {
-    origin: 'http://localhost:5173',
-  }
-});
+const io = socketio(server);
 
 const userCountUpdateDelay = 1000;
 

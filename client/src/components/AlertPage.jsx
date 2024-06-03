@@ -5,7 +5,7 @@ import { io } from "socket.io-client";
 const AlertPage = () => {
   const location = useLocation();
   const [connected, setConnected] = useState(false);
-  const socket = io('http://localhost:3001', { transports: ['websocket'] });
+  const socket = io();
 
   socket.emit('watch-room', location.state.deviceSn);
 
