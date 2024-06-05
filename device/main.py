@@ -6,6 +6,7 @@ import cv2 as cv
 import socketio
 
 from lib.models import TFLiteModel
+from lib.postprocessing import Roller
 
 
 def _get_serial_number() -> str:
@@ -24,6 +25,8 @@ def main(model_path: str, label_map: list[str], score_threshold: float) -> None:
     sio.emit('pair-device', _get_serial_number())
 
     model = TFLiteModel(model_path, label_map, score_threshold)
+    rollers = {category: Roller(length=10) for category in label_map}
+
     webcam = cv.VideoCapture(0)
 
     while webcam.isOpened():
@@ -34,10 +37,13 @@ def main(model_path: str, label_map: list[str], score_threshold: float) -> None:
         detections = [det.name for det in detections]
         counter = Counter(detections)
 
+        for category in label_map:
+            rollers[category].push(counter[category])
+
         sio.emit('ai-detections', {
-            category: counter[category]
-            for category in label_map}
-        )
+            category: rollers[category].get_mode()
+            for category in label_map
+        })
 
 
 if __name__ == '__main__':
