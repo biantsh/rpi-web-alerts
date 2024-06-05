@@ -19,19 +19,10 @@ const LoginPage = () => {
     });
   }
 
-  const handleSubmitDevice = event => {
-    event.preventDefault();
-    navigate(`/device/${newSn}`, {
-      state: {
-        deviceSn: newSn
-      }
-    });
-  }
-
   return (
     <>
       <h1>Welcome!</h1>
-      <LoginForm newSn={newSn} onSnChange={handleSnChange} onSubmit={handleSubmit} onSubmitDevice={handleSubmitDevice} />
+      <LoginForm newSn={newSn} onSnChange={handleSnChange} onSubmit={handleSubmit} />
     </>
   );
 };

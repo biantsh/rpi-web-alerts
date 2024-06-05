@@ -7,9 +7,9 @@ const AlertPage = () => {
   const [connected, setConnected] = useState(false);
   const socket = io();
 
-  socket.emit('watch-room', location.state.deviceSn);
+  socket.emit('pair-user', location.state.deviceSn);
 
-  socket.on('device-paired', isPaired => {
+  socket.on('pair-device', isPaired => {
     setConnected(isPaired);
   });
 

@@ -1,13 +1,12 @@
-const LoginForm = ({ newSn, onSnChange, onSubmit, onSubmitDevice }) => {
+const LoginForm = ({ newSn, onSnChange, onSubmit }) => {
   return (
-    <form onSubmit={onSubmit} id='loginForm'>
+    <form onSubmit={onSubmit}>
       <div>
         <p>Enter your Raspberry PI's Serial Number:</p>
-        <input value={newSn} onChange={onSnChange} id='snField'></input>
+        <input value={newSn} onChange={onSnChange}></input>
       </div>
       <div>
-        <button type='submit' id='humanButton'>I'm a human</button>
-        <button onClick={onSubmitDevice} id='deviceButton'>I'm a device</button>
+        <button type='submit'>Go</button>
       </div>
     </form>
   );
