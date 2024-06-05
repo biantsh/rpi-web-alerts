@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { io } from "socket.io-client";
 
@@ -7,11 +7,17 @@ const AlertPage = () => {
   const [connected, setConnected] = useState(false);
   const socket = io();
 
-  socket.emit('pair-user', location.state.deviceSn);
+  useEffect(() => {
+    socket.emit('pair-user', location.state.deviceSn);
+  }, []);
 
   socket.on('pair-device', isPaired => {
     setConnected(isPaired);
   });
+
+  socket.on('ai-detections', detections => {
+    console.log(detections);
+  })
 
   if (connected) {
     return (

@@ -21,6 +21,10 @@ io.on('connection', socket => {
   socket.on('pair-device', room => {
     rooms[room] = true;
 
+    socket.on('ai-detections', detections => {
+      io.to(room).emit('ai-detections', detections);
+    });
+
     socket.on('disconnect', () => {
       rooms[room] = false;
     });
