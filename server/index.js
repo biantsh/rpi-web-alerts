@@ -12,36 +12,28 @@ const server = app.listen(PORT, () => console.log(`Server running on port ${PORT
 
 const io = socketio(server);
 
-const userCountUpdateDelay = 1000;
-
 const rooms = {};
 
 io.on('connection', socket => {
   socket.on('watch-room', room => {
     socket.join(room);
-    if (!rooms[room]) {
-      rooms[room] = 0;
-    }
-    io.to(room).emit('user-count-change', rooms[room]);
   });
 
   socket.on('join-room', room => {
     socket.join(room);
-    if (!rooms[room]) {
-      rooms[room] = 0;
-    }
-    rooms[room]++;
-    io.to(room).emit('user-count-change', rooms[room]);
+  
+    rooms[room] = true;
+    io.to(room).emit('device-paired', rooms[room]);
 
     socket.on('disconnect', () => {
-      rooms[room]--;
-      io.to(room).emit('user-count-change', rooms[room]);
+      rooms[room] = false;
+      io.to(room).emit('device-unpaired', rooms[room]);
     });
   });
 });
 
 setInterval(() => {
   Object.keys(rooms).forEach(room => {
-    io.to(room).emit('user-count-change', rooms[room]);
+    io.to(room).emit('device-paired', rooms[room]);
   });
-}, userCountUpdateDelay);
+}, 1000);

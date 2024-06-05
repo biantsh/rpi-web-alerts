@@ -9,12 +9,8 @@ const AlertPage = () => {
 
   socket.emit('watch-room', location.state.deviceSn);
 
-  socket.on('user-count-change', function (userCount) {
-    if (userCount > 0) {
-      setConnected(true);
-    } else {
-      setConnected(false);
-    }
+  socket.on('device-paired', isPaired => {
+    setConnected(isPaired);
   });
 
   if (connected) {
