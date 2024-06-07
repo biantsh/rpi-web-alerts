@@ -17,7 +17,8 @@ const AlertPage = () => {
   const latestFilters = useRef(filters);
   const location = useLocation();
   const socket = io();
-  
+  var peerConnection = null;
+
   let timeoutId;
 
   useEffect(() => {
@@ -30,6 +31,19 @@ const AlertPage = () => {
 
   socket.on('pair-device', isPaired => {
     setPaired(isPaired);
+    
+    if (isPaired && !peerConnection) {
+      peerConnection = new RTCPeerConnection({
+        sdpSemantics: 'unified-plan',
+        iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }]
+      });
+
+      peerConnection.addEventListener('track', event => {
+        document.getElementById('video').srcObject = event.streams[0];;
+      });
+
+      negotiateRTC();
+    }
   });
 
   socket.on('ai-detections', detections => {
@@ -43,6 +57,10 @@ const AlertPage = () => {
       || (car && detections.car >= numSelected)) {
       activateAlert();
     }
+  });
+
+  socket.on('rtcAnswer', answer => {
+    peerConnection.setRemoteDescription(answer);
   });
 
   const togglePerson = () => {
@@ -74,6 +92,42 @@ const AlertPage = () => {
     }, 5000);
   }
 
+  const negotiateRTC = () => {
+    if (!peerConnection) return;
+
+    peerConnection.addTransceiver('video', { direction: 'recvonly' });
+
+    return peerConnection.createOffer().then(offer => {
+      return peerConnection.setLocalDescription(offer);
+    }).then(() => {
+      // wait for ICE gathering to complete
+      return new Promise(resolve => {
+        if (peerConnection.iceGatheringState === 'complete') {
+          resolve();
+        } else {
+          const checkState = () => {
+            if (peerConnection.iceGatheringState === 'complete') {
+              peerConnection.removeEventListener('icegatheringstatechange', checkState);
+              resolve();
+            }
+          };
+          peerConnection.addEventListener('icegatheringstatechange', checkState);
+        }
+      });
+    }).then(() => {
+      const offer = peerConnection.localDescription;
+      socket.emit('rtcOffer', {
+        room: location.state.deviceSn,
+        offer: {
+          sdp: offer.sdp,
+          type: offer.type
+        }
+      });
+    }).catch(error => {
+      alert(error);
+    });
+  }
+
   if (paired) {
     return (
       <>
@@ -89,6 +143,7 @@ const AlertPage = () => {
             value={filters.numSelected} onChange={handleNumberChange}/>
           </label>
         </div>
+        <video id="video" autoPlay playsInline></video>
         <Alert activated={alertActivated} />
       </>
     );

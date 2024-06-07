@@ -29,6 +29,14 @@ io.on('connection', socket => {
       rooms[room] = false;
     });
   });
+
+  socket.on('rtcOffer', data => {
+    io.emit('rtcOffer', data);
+  });
+
+  socket.on('rtcAnswer', data => {
+    io.emit('rtcAnswer', data);
+  });
 });
 
 setInterval(() => {
