@@ -1,12 +1,14 @@
 import argparse
-import time
+import asyncio
+import queue
+import threading
 from collections import Counter
-
-import cv2 as cv
-import socketio
 
 from lib.models import TFLiteModel
 from lib.postprocessing import Roller
+from lib.webrtc import sio, webrtc_client
+
+ai_queue = webrtc_client.ai_queue
 
 
 def _get_serial_number() -> str:
@@ -18,33 +20,35 @@ def _get_serial_number() -> str:
             return line.split(':')[-1].strip()
 
 
-def main(model_path: str, label_map: list[str], score_threshold: float) -> None:
-    sio = socketio.Client()
+def _run_model(model: TFLiteModel) -> None:
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
 
-    sio.connect('https://rpi-web-alerts.fly.dev')
-    sio.emit('pair-device', _get_serial_number())
+    rollers = {category: Roller(length=10) for category in model.label_map}
 
-    model = TFLiteModel(model_path, label_map, score_threshold)
-    rollers = {category: Roller(length=10) for category in label_map}
-
-    webcam = cv.VideoCapture(0)
-
-    while webcam.isOpened():
-        success, frame = webcam.read()
-        assert success
+    while True:
+        frame = ai_queue.get()
 
         detections = model.get_detections(frame)
-        detections = [det.name for det in detections]
-        counter = Counter(detections)
+        counter = Counter([det.name for det in detections])
 
-        for category in label_map:
+        for category in model.label_map:
             rollers[category].push(counter[category])
 
-        sio.emit('ai-detections', {
+        loop.run_until_complete(sio.emit('ai-detections', {
             category: rollers[category].get_mode()
-            for category in label_map
-        })
+            for category in model.label_map
+        }))
 
+
+async def main(model_path: str, label_map: list[str], score_threshold: float) -> None:
+    await sio.connect('https://rpi-web-alerts.fly.dev')
+    await sio.emit('pair-device', _get_serial_number())
+
+    model = TFLiteModel(model_path, label_map, score_threshold)
+    threading.Thread(target=_run_model, args=(model,), daemon=True).start()
+
+    await sio.wait()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -53,4 +57,4 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--score_threshold', type=float)
 
     args = parser.parse_args()
-    main(args.model_path, args.label_map, args.score_threshold)
+    asyncio.run(main(args.model_path, args.label_map, args.score_threshold))

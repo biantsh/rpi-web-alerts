@@ -10,7 +10,7 @@ from lib.detections import Detection
 
 class TFLiteModel(tf.lite.Interpreter):
     def __init__(self, model_path: str, label_map: Sequence, score_threshold: float) -> None:
-        super().__init__(model_path, num_threads=4)
+        super().__init__(model_path, num_threads=1)
         self.allocate_tensors()
 
         self.label_map = label_map
@@ -24,7 +24,6 @@ class TFLiteModel(tf.lite.Interpreter):
         data_type = self.input_details['dtype']
 
         image = cv.resize(image, (width, height))
-        image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
         tensor = np.expand_dims(image, 0).astype(data_type)
 
         return tensor
@@ -62,10 +61,4 @@ class TFLiteModel(tf.lite.Interpreter):
 
             detections.append(Detection(name, score, position))
 
-        return detections
-
-    def run_on_frame(self, frame: VideoFrame) -> list[Detection]:
-        image = frame.to_ndarray(format='bgr24')
-        detections = self.get_detections(image)
-        
         return detections
