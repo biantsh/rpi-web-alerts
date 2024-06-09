@@ -3,6 +3,7 @@ from typing import Sequence
 import cv2 as cv
 import numpy as np
 import tensorflow as tf
+from av import VideoFrame
 
 from lib.detections import Detection
 
@@ -61,4 +62,10 @@ class TFLiteModel(tf.lite.Interpreter):
 
             detections.append(Detection(name, score, position))
 
+        return detections
+
+    def run_on_frame(self, frame: VideoFrame) -> list[Detection]:
+        image = frame.to_ndarray(format='bgr24')
+        detections = self.get_detections(image)
+        
         return detections

@@ -22,6 +22,7 @@ const AlertPage = () => {
   }, [filters]);
 
   socket.on('ai-detections', detections => {
+    console.log(detections);
     const { person, bike, car, numSelected } = latestFilters.current;
 
     if ((person && detections.person >= numSelected) ||
