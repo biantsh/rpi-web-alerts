@@ -21,7 +21,7 @@ const LoginPage = () => {
 
   return (
     <>
-      <h1>Welcome!</h1>
+      <h1 style={{textAlign:'center', fontSize:'50px', color:"green"}}>Welcome!</h1>
       <LoginForm newSn={newSn} onSnChange={handleSnChange} onSubmit={handleSubmit} />
     </>
   );
