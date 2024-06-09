@@ -1,5 +1,5 @@
-import { useRef, useState, useEffect } from "react";
-import { io } from "socket.io-client";
+import { useRef, useState, useEffect } from 'react';
+import { io } from 'socket.io-client';
 
 const useWebRTC = deviceSn => {
   const [paired, setPaired] = useState(false);
@@ -24,10 +24,24 @@ const useWebRTC = deviceSn => {
       }
     });
 
-    return () => {
-      socket.off('pair-device');
-      socket.off('rtcAnswer');
-    };
+    socket.on('rtcCleanup', () => {
+      if (peerConnection.current) {
+        peerConnection.current.getSenders().forEach(sender => {
+          if (sender.track) {
+            sender.track.stop();
+          }
+        });
+        peerConnection.current.close();
+        peerConnection.current = null;
+      }
+  
+      if (socket.current) {
+        socket.current.disconnect();
+        socket.current = null;
+      }
+  
+      setPaired(false);
+    });
   }, [deviceSn, socket]);
 
   const initializePeerConnection = () => {
@@ -50,6 +64,7 @@ const useWebRTC = deviceSn => {
       return new Promise(resolve => {
         if (peerConnection.current.iceGatheringState === 'complete') {
           resolve();
+
         } else {
           const checkState = () => {
             if (peerConnection.current.iceGatheringState === 'complete') {

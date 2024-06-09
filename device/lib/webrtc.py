@@ -1,16 +1,15 @@
 import asyncio
+import atexit
 import json
-
 import av
 import aiortc
 import numpy as np
 import socketio
+
 from aiortc import RTCPeerConnection, RTCSessionDescription
 from aiortc.contrib.media import MediaPlayer, MediaRelay
 from aiortc.mediastreams import VideoStreamTrack
 from av import VideoFrame
-
-sio = socketio.AsyncClient()
 
 
 class VideoTransformTrack(VideoStreamTrack):
@@ -31,40 +30,68 @@ class VideoTransformTrack(VideoStreamTrack):
         return new_frame
 
 
-async def create_local_tracks() -> VideoTransformTrack:
-    options = {
-        'framerate': '30',
-        'video_size': '1280x720'
-    }
-    webcam = MediaPlayer(
-        'video=REDRAGON  Live Camera', format='dshow', options=options
-    )
-    relay = MediaRelay()
+class WebRTCClient:
+    def __init__(self) -> None:
+        self.peer_connection = None
+        self.webcam = None
 
-    return VideoTransformTrack(relay.subscribe(webcam.video))
+    async def create_local_tracks(self) -> VideoTransformTrack:
+        options = {
+            'framerate': '30',
+            'video_size': '1280x720'
+        }
+        self.webcam = MediaPlayer(
+            'video=REDRAGON  Live Camera', format='dshow', options=options
+        )
+        relay = MediaRelay()
+
+        return VideoTransformTrack(relay.subscribe(self.webcam.video))
+
+    async def handle_rtc_offer(self, data: dict) -> None:
+        room, params = data['room'], data['offer']
+        offer = RTCSessionDescription(sdp=params['sdp'], type=params['type'])
+
+        video = await self.create_local_tracks()
+
+        self.peer_connection = RTCPeerConnection()
+        self.peer_connection.addTrack(video)
+
+        await self.peer_connection.setRemoteDescription(offer)
+        
+        answer = await self.peer_connection.createAnswer()
+        await self.peer_connection.setLocalDescription(answer)
+
+        await sio.emit('rtcAnswer', {
+            'sdp': self.peer_connection.localDescription.sdp, 
+            'type': self.peer_connection.localDescription.type
+        })
+
+    async def handle_cleanup(self) -> None:
+        if self.peer_connection:
+            await self.peer_connection.close()
+            self.peer_connection = None
+
+        if self.webcam:
+            self.webcam.video.stop()
+            self.webcam = None
+
+    async def cleanup(self) -> None:
+        await self.handle_cleanup()
 
 
-async def handle_rtc_offer(data: dict) -> None:
-    room, params = data['room'], data['offer']
-    offer = RTCSessionDescription(sdp=params['sdp'], type=params['type'])
-
-    video = await create_local_tracks()
-
-    peer_connection = RTCPeerConnection()
-    peer_connection.addTrack(video)
-
-    await peer_connection.setRemoteDescription(offer)
-    
-    answer = await peer_connection.createAnswer()
-    await peer_connection.setLocalDescription(answer)
-
-    await sio.emit('rtcAnswer', {
-        'sdp': peer_connection.localDescription.sdp, 
-        'type': peer_connection.localDescription.type
-    })
+sio = socketio.AsyncClient()
+webrtc_client = WebRTCClient()
 
 
 @sio.event
 async def rtcOffer(data: dict) -> None:
     loop = asyncio.get_event_loop()
-    asyncio.run_coroutine_threadsafe(handle_rtc_offer(data), loop)
+    asyncio.run_coroutine_threadsafe(webrtc_client.handle_rtc_offer(data), loop)
+
+
+@sio.event
+async def rtcCleanup() -> None:
+    await webrtc_client.cleanup()
+
+
+atexit.register(asyncio.run, webrtc_client.handle_cleanup())

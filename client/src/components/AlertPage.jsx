@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import Alert from "./Alert";
-import useWebRTC from "../hooks/useWebRTC";
+import { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import Alert from './Alert';
+import useWebRTC from '../hooks/useWebRTC';
 
 const AlertPage = () => {
   const [filters, setFilters] = useState({
@@ -75,7 +75,7 @@ const AlertPage = () => {
             value={filters.numSelected} onChange={handleNumberChange}/>
           </label>
         </div>
-        <video id="video" autoPlay playsInline></video>
+        <video id='video' autoPlay playsInline></video>
         <Alert activated={alertActivated} />
       </>
     );

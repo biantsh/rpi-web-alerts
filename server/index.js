@@ -16,6 +16,10 @@ const rooms = {};
 io.on('connection', socket => {
   socket.on('pair-user', room => {
     socket.join(room);
+
+    socket.on('disconnect', () => {
+      io.emit('rtcCleanup');
+    });
   });
 
   socket.on('pair-device', room => {
