@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { io } from "socket.io-client";
-
+import './AlertPage.scss'
 import Alert from "./Alert";
 
 const AlertPage = () => {
@@ -95,10 +95,15 @@ const AlertPage = () => {
   }
 
   return (
-    <>
-      <h1>Alert Page</h1>
+    <div className="alert-wrapper">
+  <div className="loader"></div>
+      <div>
+            <h1>Alert Page</h1>
       <p>No device has been detected...</p>
-    </>
+      </div>
+  
+
+    </div>
   );
 };
 
