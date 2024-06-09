@@ -3,13 +3,14 @@ from typing import Sequence
 import cv2 as cv
 import numpy as np
 import tensorflow as tf
+from av import VideoFrame
 
 from lib.detections import Detection
 
 
 class TFLiteModel(tf.lite.Interpreter):
     def __init__(self, model_path: str, label_map: Sequence, score_threshold: float) -> None:
-        super().__init__(model_path, num_threads=4)
+        super().__init__(model_path, num_threads=1)
         self.allocate_tensors()
 
         self.label_map = label_map
@@ -23,7 +24,6 @@ class TFLiteModel(tf.lite.Interpreter):
         data_type = self.input_details['dtype']
 
         image = cv.resize(image, (width, height))
-        image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
         tensor = np.expand_dims(image, 0).astype(data_type)
 
         return tensor
