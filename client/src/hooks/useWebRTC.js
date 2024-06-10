@@ -47,7 +47,7 @@ const useWebRTC = deviceSn => {
   const initializePeerConnection = () => {
     peerConnection.current = new RTCPeerConnection({
       sdpSemantics: 'unified-plan',
-      iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }]
+      iceServers: [{ urls: 'stun:stun.1und1.de:3478' }]
     });
 
     peerConnection.current.addEventListener('track', event => {
