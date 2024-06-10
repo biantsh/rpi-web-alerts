@@ -62,13 +62,17 @@ const useWebRTC = deviceSn => {
       return peerConnection.current.setLocalDescription(offer);
     }).then(() => {
       return new Promise(resolve => {
+        console.log('Beginning ICE gathering...')
         if (peerConnection.current.iceGatheringState === 'complete') {
+          console.log('ICE gathering complete.');
           resolve();
 
         } else {
           const checkState = () => {
+            console.log(`ICE gathering state: ${peerConnection.current.iceGatheringState}...`)
             if (peerConnection.current.iceGatheringState === 'complete') {
               peerConnection.current.removeEventListener('icegatheringstatechange', checkState);
+              console.log('ICE gathering complete.');
               resolve();
             }
           };

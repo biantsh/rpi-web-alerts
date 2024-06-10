@@ -1,3 +1,6 @@
+aiohttp==3.9.5
+aiortc==1.9.0
+av==12.1.0
 numpy==1.26.4
 opencv-python==4.10.0.82
 python-socketio[client]==5.11.2

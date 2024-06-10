@@ -1,6 +1,6 @@
 import asyncio
 import json
-import queue
+import multiprocessing
 import threading
 
 import aiortc
@@ -13,7 +13,7 @@ from aiortc.mediastreams import VideoStreamTrack
 from av import VideoFrame
 
 class FrameProcessor:
-    def __init__(self, track: VideoStreamTrack, ai_queue: queue.Queue) -> None:
+    def __init__(self, track: VideoStreamTrack, ai_queue: multiprocessing.Queue) -> None:
         self.track = track
         self.ai_queue = ai_queue
 
@@ -28,7 +28,7 @@ class FrameProcessor:
 
 
 class WebRTCClient:
-    def __init__(self, ai_queue: queue.Queue) -> None:
+    def __init__(self, ai_queue: multiprocessing.Queue) -> None:
         self.ai_queue = ai_queue
         
         self.webcam = None
@@ -38,11 +38,11 @@ class WebRTCClient:
     async def create_local_track(self) -> VideoStreamTrack:
         options = {
             'framerate': '30',
-            'video_size': '1280x720'
+            'video_size': '640x480'
         }
         self.webcam = MediaPlayer(
-            'video=REDRAGON  Live Camera',
-            format='dshow', options=options
+            '/dev/video0',
+            format='v4l2', options=options
         )
         relay = MediaRelay()
         track = relay.subscribe(self.webcam.video)
@@ -86,7 +86,15 @@ class WebRTCClient:
 
 
 sio = socketio.AsyncClient()
-webrtc_client = WebRTCClient(queue.Queue(maxsize=1))
+webrtc_client = WebRTCClient(multiprocessing.Queue(maxsize=1))
+
+@sio.event
+def connect():
+    print('Connection established')
+
+@sio.event
+def disconnect():
+    print('Disconnected from server')
 
 @sio.event
 async def rtcOffer(data: dict) -> None:
