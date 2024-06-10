@@ -89,14 +89,6 @@ sio = socketio.AsyncClient()
 webrtc_client = WebRTCClient(multiprocessing.Queue(maxsize=1))
 
 @sio.event
-def connect():
-    print('Connection established')
-
-@sio.event
-def disconnect():
-    print('Disconnected from server')
-
-@sio.event
 async def rtcOffer(data: dict) -> None:
     loop = asyncio.get_event_loop()
     asyncio.run_coroutine_threadsafe(webrtc_client.handle_rtc_offer(data), loop)

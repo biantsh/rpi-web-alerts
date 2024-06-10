@@ -28,9 +28,8 @@ def _run_model(model_path: str, label_map: list[str], score_threshold: float) ->
     while True:
         if ai_frames_queue.empty():
             continue
-        else:
-            frame = ai_frames_queue.get()
 
+        frame = ai_frames_queue.get()
         detections = model.get_detections(frame)
         counter = Counter([det.name for det in detections])
 
@@ -45,7 +44,7 @@ def _run_model(model_path: str, label_map: list[str], score_threshold: float) ->
 
 async def main(model_path: str, label_map: list[str], score_threshold: float) -> None:
     await sio.connect('https://rpi-web-alerts.fly.dev')
-    await sio.emit('pair-device', 'ply')
+    await sio.emit('pair-device', _get_serial_number())
 
     multiprocessing.Process(
         target=_run_model, 
