@@ -83,10 +83,11 @@ const AlertPage = () => {
   }
 
   return (
-    <>
-      <h1>Alert Page</h1>
-      <p>No device has been detected...</p>
-    </>
+    <div id="waiting-div">
+      <h1>Just a moment...</h1>
+      <p>Waiting for your Raspberry Pi device to be detected...</p>
+      <div id="spinner"></div>
+    </div>
   );
 };
 

@@ -21,7 +21,7 @@ const LoginPage = () => {
 
   return (
     <>
-      <h1>Welcome!</h1>
+      <h1>Raspberry Pi Web Alerts</h1>
       <LoginForm newSn={newSn} onSnChange={handleSnChange} onSubmit={handleSubmit} />
     </>
   );
