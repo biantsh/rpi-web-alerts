@@ -72,3 +72,75 @@ input::placeholder {
   50% { transform: rotate(450deg); }
   100% { transform: rotate(720deg); }
 }
+
+#alert {
+  font-size: 25px;
+  color: white;
+  background-color: #e73b2e;
+  border-radius: 17px;
+  height: 45px;
+  width: 60%;
+  margin: auto;
+  margin-top: 20px;
+  padding-top: 10px;
+  padding-left: 20px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+#alert-page-title {
+  margin-bottom: 0;
+}
+
+#alert-page-subtitle {
+  font-size: 16px;
+  margin-top: 7px;
+  margin-bottom: 30px;
+}
+
+.hidden-checkbox {
+  display: none; 
+}
+
+.button-style {
+  padding: 10px 20px;
+  background-color: rgb(184, 184, 184);
+  color: white;
+  font-family: Arial, sans-serif;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.1s;
+  display: inline-block;
+}
+
+.button-style.active {
+  background-color: #3f5eba;
+}
+
+#live-feed {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.alert-hidden {
+  animation: fadeOut 1s forwards;
+}

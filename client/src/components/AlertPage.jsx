@@ -64,19 +64,46 @@ const AlertPage = () => {
   if (paired) {
     return (
       <>
-        <h1>Alert Page</h1>
-        <p>Monitoring for alerts...</p>
-        <div>
-          <div>
-            <label><input type='checkbox' onClick={togglePerson}/>Person</label>
-            <label><input type='checkbox' onClick={toggleBike}/>Bike</label>
-            <label><input type='checkbox' onClick={toggleCar}/>Car</label>
+        <h1 id='alert-page-title'>Connected to room!</h1>
+        <p id='alert-page-subtitle'>Monitoring for alerts...</p>
+        <div id='live-feed'>
+          <div id='filter-buttons'>
+            <label className={`button-style ${filters.person ? 'active' : ''}`}>
+              <input 
+                type='checkbox' 
+                className='hidden-checkbox' 
+                onClick={togglePerson}
+                checked={filters.person}
+                readOnly
+              />
+              Person
+            </label>
+            <label className={`button-style ${filters.bike? 'active' : ''}`}>
+              <input 
+                type='checkbox' 
+                className='hidden-checkbox' 
+                onClick={toggleBike}
+                checked={filters.bike}
+                readOnly
+              />
+              Bike
+            </label>
+            <label className={`button-style ${filters.car ? 'active' : ''}`}>
+              <input 
+                type='checkbox' 
+                className='hidden-checkbox' 
+                onClick={toggleCar}
+                checked={filters.car}
+                readOnly
+              />
+              Car
+            </label>
           </div>
           <label>Number:<input type='number' min='1' max='5' 
             value={filters.numSelected} onChange={handleNumberChange}/>
           </label>
+          <video id='video' autoPlay playsInline></video>
         </div>
-        <video id='video' autoPlay playsInline></video>
         <Alert activated={alertActivated} />
       </>
     );
