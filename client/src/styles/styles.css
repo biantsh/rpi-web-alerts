@@ -61,7 +61,7 @@ input::placeholder {
   width: 50px;
   height: 50px;
   border: 5px solid #f3f3f3;
-  border-top: 5px solid blue;
+  border-top: 5px solid #3f5eba;
   border-radius: 50%;
   margin: auto;
   animation: spin 2s cubic-bezier(0.5, 0.1, 0.1, 1) infinite;
