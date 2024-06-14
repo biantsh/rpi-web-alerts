@@ -4,12 +4,13 @@ Turn your Raspberry Pi into an AI-powered security camera via HTTPS, TensorFlow 
 
 # How it works
 
+
 - The code inside `/device` goes inside the Raspberry Pi as a system service.
 - The rest of the code is deployed at https://rpi-web-alerts.fly.dev.
 - That's it!
 
 # How it looks
 
-<img src='https://github.com/biantsh/rpi-web-alerts/assets/94078217/55a3f84b-0982-4c87-98b7-18f489162738' width=750 />
-<img src='https://github.com/biantsh/rpi-web-alerts/assets/94078217/19ca1ea1-d1ce-4dc8-bc76-2d1ccdfafb56' width=750 />
-<img src='https://github.com/biantsh/rpi-web-alerts/assets/94078217/af0a406e-f453-4887-ac79-a7cb5eafbf19' width=750 />
+<img src='https://github.com/biantsh/rpi-web-alerts/assets/94078217/46f33b0e-9392-410a-a545-f7fd6b6ad135' width=750 />
+<img src='https://github.com/biantsh/rpi-web-alerts/assets/94078217/f6d77aaf-c416-4ce2-b3a2-364f350884fe' width=750 />
+<img src='https://github.com/biantsh/rpi-web-alerts/assets/94078217/c0390221-1a07-41a7-90bd-0b16a10a8143' width=750 />
