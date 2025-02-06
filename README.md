@@ -1,9 +1,8 @@
-# Raspberry Pi Web Alerts
+# Sentry
 
-Turn your Raspberry Pi into an AI-powered security camera via HTTPS, TensorFlow and WebRTC.
+Turn any Raspberry Pi into an AI-powered security camera via HTTPS, TensorFlow and WebRTC.
 
 # How it works
-
 
 - The code inside `/device` goes inside the Raspberry Pi as a system service.
 - The rest of the code is deployed at https://rpi-web-alerts.fly.dev.
