@@ -1,6 +1,6 @@
 # Sentry
 
-Turn any Raspberry Pi into an AI-powered security camera via HTTPS, TensorFlow and WebRTC.
+Turn any Raspberry Pi into an AI-powered security camera via TensorFlow, WebRTC and HTTPS.
 
 # How it works
 
